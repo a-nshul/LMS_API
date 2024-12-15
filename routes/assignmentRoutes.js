@@ -1,13 +1,15 @@
-const express = require("express");
-const {
-  createAssignment,
-  getAssignments,
-  submitAssignment,
-} = require("../controllers/assignmentController");
-
+const express = require('express');
 const router = express.Router();
+const assignmentController = require('../controllers/assignmentController');
+const upload = require('../middleware/upload');
 
-router.route("/").post(createAssignment).get(getAssignments);
-router.route("/submit").post(submitAssignment);
+// Create a new assignment
+router.post('/create', assignmentController.createAssignment);
+
+// Fetch all assignments
+router.get('/', assignmentController.getAssignments);
+
+// Submit an assignment with file upload
+router.post('/submit/:assignmentId', upload.single('file'), assignmentController.submitAssignment);
 
 module.exports = router;

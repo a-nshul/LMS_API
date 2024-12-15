@@ -1,37 +1,62 @@
-const asyncHandler = require("express-async-handler");
-const Assignment = require("../models/Assignment");
+const Assignment = require('../models/Assignment');
 
-const createAssignment = asyncHandler(async (req, res) => {
-  const { teacher, title, description, dueDate } = req.body;
+// Create a new assignment
+const createAssignment = async (req, res) => {
+  try {
+    const { teacherName, teacherEmail, title, description, dueDate } = req.body;
 
-  if (!teacher || !title || !description || !dueDate) {
-    res.status(400).json({ message: "Please provide all required fields" });
-    return;
+    const newAssignment = new Assignment({
+      teacherName,
+      teacherEmail,
+      title,
+      description,
+      dueDate,
+    });
+
+    await newAssignment.save();
+    res.status(201).json({ message: 'Assignment created successfully', assignment: newAssignment });
+  } catch (error) {
+    res.status(500).json({ message: 'Error creating assignment', error: error.message });
   }
+};
 
-  const assignment = await Assignment.create({ teacher, title, description, dueDate });
-  res.status(201).json({ assignment, message: "Assignment created successfully" });
-});
-
-const getAssignments = asyncHandler(async (req, res) => {
-  const assignments = await Assignment.find({}).populate("teacher", "name email");
-  res.status(200).json({ assignments, message: "Assignments fetched successfully" });
-});
-
-const submitAssignment = asyncHandler(async (req, res) => {
-  const { assignmentId, student, fileUrl } = req.body;
-
-  const assignment = await Assignment.findById(assignmentId);
-
-  if (!assignment) {
-    res.status(404).json({ message: "Assignment not found" });
-    return;
+// Fetch assignments
+const getAssignments = async (req, res) => {
+  try {
+    const assignments = await Assignment.find();
+    if (!assignments || assignments.length === 0) {
+      return res.status(404).json({ message: 'No assignments found' });
+    }
+    res.status(200).json({ assignments });
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching assignments', error: error.message });
   }
+};
 
-  assignment.submissions.push({ student, fileUrl });
-  await assignment.save();
+// Submit assignment
+const submitAssignment = async (req, res) => {
+  try {
+    const { assignmentId } = req.params;
+    const { studentName, studentEmail } = req.body;
+    const fileUrl = req.file ? req.file.path : null;
 
-  res.status(201).json({ message: "Assignment submitted successfully" });
-});
+    const assignment = await Assignment.findById(assignmentId);
+    if (!assignment) {
+      return res.status(404).json({ message: 'Assignment not found' });
+    }
+
+    // Push the student's submission details
+    assignment.submissions.push({
+      studentName,
+      studentEmail,
+      fileUrl,
+    });
+
+    await assignment.save();
+    res.status(200).json({ message: 'Assignment submitted successfully', assignment });
+  } catch (error) {
+    res.status(500).json({ message: 'Error submitting assignment', error: error.message });
+  }
+};
 
 module.exports = { createAssignment, getAssignments, submitAssignment };

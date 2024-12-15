@@ -2,9 +2,12 @@ const mongoose = require("mongoose");
 
 const assignmentSchema = mongoose.Schema(
   {
-    teacher: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+    teacherName: {
+      type: String,
+      required: true,
+    },
+    teacherEmail: {
+      type: String,
       required: true,
     },
     title: {
@@ -21,9 +24,11 @@ const assignmentSchema = mongoose.Schema(
     },
     submissions: [
       {
-        student: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "User",
+        studentName: {
+          type: String,
+        },
+        studentEmail: {
+          type: String,
         },
         fileUrl: {
           type: String,

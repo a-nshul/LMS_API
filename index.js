@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors"); // Import the CORS middleware
 const connectDB = require("./config/db");
+const path = require('path');
 const dotenv = require("dotenv");
 const userRoutes = require("./routes/userRoutes");
 const attendenceRoutes = require("./routes/attendanceRoutes");
@@ -24,8 +25,9 @@ app.use(cors({
 // Define routes
 app.use("/api/user", userRoutes);
 app.use("/api/attendence", attendenceRoutes);
-app.use("/api/assignments", assignmentRoutes);
-
+// app.use("/api/assignments", assignmentRoutes);
+// Serve uploaded files
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // Error Handling middlewares
 app.use(notFound);
 app.use(errorHandler);
