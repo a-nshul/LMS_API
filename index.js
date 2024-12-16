@@ -17,15 +17,19 @@ app.use(express.json());
 
 // Enable CORS
 app.use(cors({
-  origin: '*', // Allows requests from all origins
-  methods: ['GET', 'POST', 'PUT', 'DELETE'], // Specify allowed HTTP methods
-  allowedHeaders: ['Content-Type', 'Authorization'] // Specify allowed headers
+  origin: "*", // Allow all origins
+  credentials: true, // Allow credentials (cookies, authorization headers, etc.)
+  allowedHeaders: ["Content-Type", "Authorization"], // Allowed headers
+  exposedHeaders: ["X-Auth-Token"], // Expose custom headers
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Allowed methods
+  preflightContinue: false,
+  optionsSuccessStatus: 204, // For older browsers
 }));
 
 // Define routes
 app.use("/api/user", userRoutes);
 app.use("/api/attendence", attendenceRoutes);
-// app.use("/api/assignments", assignmentRoutes);
+app.use("/api/assignments", assignmentRoutes);
 // Serve uploaded files
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // Error Handling middlewares
