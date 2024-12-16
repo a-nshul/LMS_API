@@ -25,6 +25,7 @@ app.use(cors({
   preflightContinue: false,
   optionsSuccessStatus: 204, // For older browsers
 }));
+app.use(express.urlencoded({ extended: true }));
 
 // Define routes
 app.use("/api/user", userRoutes);
